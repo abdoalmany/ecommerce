@@ -38,6 +38,7 @@
     <br>
   <div class="box-element hidden" id="payment-info">
   	<small>Paypal Options</small>
+		<button class="btn btn-outline-dark" id="make-payment">Make Payment</button>
   </div>
 
 	</div>
@@ -61,4 +62,94 @@
 		</div>
 	</div>
 </div>
+<script type="text/javascript">
+	//See if the order is digital to remove shipping section
+	var shipping = "{{order.shipping}}"
+	var total ="{{order.get_cart_total|floatformat:2}}"
+	if(shipping=='False'){
+		document.getElementById('shipping-info').innerHTML = ''
+	}
+	// See if already the user is logged in so we have his user information we do not need to take it again.
+	if (user !='AnonymousUser') {
+		document.getElementById('user-info').innerHTML= ''
+	}
+	//See if the user is logged in and the order is digital one so show him the payment option directly .
+	if (shipping=='False' && user!='AnonymousUser') {
+		//Hide the form
+		document.getElementById('form-wrapper').classList.add('hidden')
+		//Show the payment option
+		document.getElementById('payment-info').classList.remove('hidden')
+
+	}
+
+	//After submiting the form hide the form button and show payment option
+	var form = document.getElementById('form')
+	form.addEventListener('submit' , function(e){
+		e.preventDefault()
+		console.log('form submitted ..')
+		document.getElementById('form-button').classList.add('hidden')
+		document.getElementById('payment-info').classList.remove('hidden')
+	})
+
+	var paymentButton = document.getElementById('make-payment')
+	paymentButton.addEventListener('click' , function(e){
+		submitFormData()
+	})
+
+		var total = '{{order.get_cart_total}}'
+    function submitFormData(){
+    	console.log('Payment button clicked')
+
+    	var userFormData = {
+			'name':null,
+			'email':null,
+			'total':total,
+		}
+
+		var shippingInfo = {
+			'address':null,
+			'city':null,
+			'state':null,
+			'zipcode':null,
+		}
+
+		if (shipping != 'False'){
+    		shippingInfo.address = form.address.value
+	    	shippingInfo.city = form.city.value
+	    	shippingInfo.state = form.state.value
+	    	shippingInfo.zipcode = form.zipcode.value
+    	}
+
+    	if (user == 'AnonymousUser'){
+    		userFormData.name = form.name.value
+    		userFormData.email = form.email.value
+    	}
+
+    	console.log('Shipping Info:', shippingInfo)
+    	console.log('User Info:', userFormData)
+
+    	var url = "/process_order/"
+    	fetch(url, {
+    		method:'POST',
+    		headers:{
+    			'Content-Type':'applicaiton/json',
+    			'X-CSRFToken':csrftoken,
+    		},
+    		body:JSON.stringify({'form':userFormData, 'shipping':shippingInfo}),
+
+    	})
+    	.then((response) => response.json())
+    	.then((data) => {
+			console.log('Success:', data);
+			alert('Transaction completed');
+
+			//cart = {}
+			//document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+
+			window.location.href = "{% url 'store' %}"
+
+			})
+    }
+
+</script>
 {% endblock %}
