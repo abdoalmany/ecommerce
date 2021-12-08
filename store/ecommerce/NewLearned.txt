@@ -1,0 +1,11 @@
+***HTML***
+********************
+***JAVASCRIPT***
+Fetch:-
+This kind of functionality was previously achieved using XMLHttpRequest:(You can retrieve data from a URL without having to do a full page refresh. This enables a Web page to update just part of a page without disrupting what the user is doing.)
+used to send the data of the product that the user clicked on (add to the cart ) and the user data that we made with javascript to the backend views as a json objects .
+========================================================================================
+***PYTHON***
+************************************
+***DJANGO***
+*********************************
